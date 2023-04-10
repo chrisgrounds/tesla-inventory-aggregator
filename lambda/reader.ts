@@ -71,7 +71,7 @@ const buildEmailBody = (inventory: InventoryData[]) => {
                                       </tr>
                                     </thead>
                                     <tbody>
-                                      ${inventory.map(buildListItem)}
+                                      ${inventory.map(buildListItem).join('')}
                                     </tbody>
                                   </table>
                                 </td>
