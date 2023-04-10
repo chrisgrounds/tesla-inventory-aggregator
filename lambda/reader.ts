@@ -43,14 +43,53 @@ const buildEmailBody = (inventory: InventoryData[]) => {
   return `
   <html>
     <body>
-      <h1 style="">Tesla Inventory</h1>
-      <table>
+      <table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable">
         <tr>
-          <th>Model</th>
-          <th>Year</th>
-          <th>Price</th>
+            <td align="center" valign="top">
+                <table border="0" cellpadding="20" cellspacing="0" width="600" id="emailContainer">
+                    <tr>
+                        <td align="center" valign="top">
+                            <table border="0" cellpadding="20" cellspacing="0" width="100%" id="emailHeader">
+                                <tr>
+                                    <td align="center" valign="top">
+                                      <h1>Tesla Inventory</h1>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" valign="top">
+                            <table border="0" cellpadding="20" cellspacing="0" width="100%" id="emailBody">
+                                <tr>
+                                    <td align="center" valign="top">
+                                      <table>
+                                        <tr>
+                                          <th>Model</th>
+                                          <th>Year</th>
+                                          <th>Price</th>
+                                        </tr>
+                                        ${inventory.map(buildListItem)}
+                                      </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" valign="top">
+                            <table border="0" cellpadding="20" cellspacing="0" width="100%" id="emailFooter">
+                                <tr>
+                                    <td align="center" valign="top">
+                                        <p>Thanks for reading!</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
         </tr>
-        ${inventory.map(buildListItem)}
       </table>
     </body>
   </html>`
