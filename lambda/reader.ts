@@ -36,7 +36,7 @@ type InventoryData = {
 const tslaInventoryApi = "https://www.tesla.com/inventory/api/v1/inventory-results?query=%7B%22query%22%3A%7B%22model%22%3A%22ms%22%2C%22condition%22%3A%22used%22%2C%22options%22%3A%7B%7D%2C%22arrangeby%22%3A%22Price%22%2C%22order%22%3A%22asc%22%2C%22market%22%3A%22GB%22%2C%22language%22%3A%22en%22%2C%22super_region%22%3A%22north%20america%22%2C%22lng%22%3A-1.5151%2C%22lat%22%3A54.5554%2C%22zip%22%3A%22DL1%22%2C%22range%22%3A0%2C%22region%22%3A%22ON%22%7D%2C%22offset%22%3A0%2C%22count%22%3A50%2C%22outsideOffset%22%3A0%2C%22outsideSearch%22%3Afalse%7D";
 
 const buildListItem = (item: InventoryData) =>
-  `<tr><td>${item.model} (${item.trim_name})</td><td>${item.year}</td><td>£${item.total_price}</td></tr>`;
+  `<tr><td style="padding:10px 20px;">${item.model} (${item.trim_name})</td><td style="padding:10px 20px;">${item.year}</td><td style="padding:10px 20px;">£${item.total_price}</td></tr>`;
 
 const buildEmailBody = (inventory: InventoryData[]) => {
   return `
@@ -62,12 +62,12 @@ const buildEmailBody = (inventory: InventoryData[]) => {
                           <table border="0" cellpadding="20" cellspacing="0" width="100%" id="emailBody">
                               <tr>
                                 <td align="center" valign="top">
-                                  <table>
+                                  <table style="border-collapse:collapse">
                                     <thead style="background:#009879">
                                       <tr style="background:#009879">
-                                        <th><font style="font-size:14px" color="white">Model</font></th>
-                                        <th><font style="font-size:14px" color="white">Year</font></th>
-                                        <th><font style="font-size:14px" color="white">Price</font></th>
+                                        <th style="padding:10px 20px;"><font style="font-size:14px" color="white">Model</font></th>
+                                        <th style="padding:10px 20px;"><font style="font-size:14px" color="white">Year</font></th>
+                                        <th style="padding:10px 20px;"><font style="font-size:14px" color="white">Price</font></th>
                                       </tr>
                                     </thead>
                                     <tbody>
