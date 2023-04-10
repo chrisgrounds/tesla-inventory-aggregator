@@ -52,7 +52,7 @@ export const handler: Handler = async (event, context) => {
 
     const command = new SendEmailCommand({
       Destination: {
-        ToAddresses: [process.env.TO_ADDR],
+        ToAddresses: [process.env.TO_ADDR || ""],
       },
       Message: {
         Body: {
@@ -60,7 +60,7 @@ export const handler: Handler = async (event, context) => {
         },
         Subject: { Data: "Hello from lambda" },
       },
-      Source: process.env.SOURCE_ADDR,
+      Source: process.env.SOURCE_ADDR || "",
     });
 
     try {
