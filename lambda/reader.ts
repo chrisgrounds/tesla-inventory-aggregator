@@ -40,7 +40,13 @@ const buildListItem = (item: InventoryData) => {
 }
 
 const buildEmailBody = (inventory: InventoryData[]) => {
-  return `<html><body><h1>Tesla Inventory<h1><ul>${inventory.map(buildListItem)}</ul></body > </html>`
+  return `
+  <html>
+    <body>
+      <h1 style="">Tesla Inventory</h1>
+      <ul>${inventory.map(buildListItem)}</ul>
+    </body>
+  </html>`
 }
 
 export const handler: Handler = async (_event, _context) => {
