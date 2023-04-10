@@ -35,7 +35,7 @@ export class TslaInventoryAggregatorStack extends cdk.Stack {
         day: '*',
         weekDay: '*',
         month: '*',
-        year: '*'
+        year: '*',
       }),
     });
 
