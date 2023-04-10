@@ -39,7 +39,7 @@ const constructEmailBody = (inventory: InventoryData[]) => {
   return `<html><body><h1>Tesla Inventory<h1><p>${inventory[0].trim_name}, ${inventory[0].price}</body></html>`
 }
 
-export const handler: Handler = async (event, context) => {
+export const handler: Handler = async (_event, _context) => {
   try {
     const res = await fetch(tslaInventoryApi, {
       "headers": {},
