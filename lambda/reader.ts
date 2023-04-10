@@ -49,11 +49,9 @@ export const handler: Handler = async (event, context) => {
 
     const inventory = await res.json();
 
-    const sortedInventory = inventory
+    const top5Cheapest: InventoryData[] = inventory
       .results
-      .sort((a: { price: number; }, b: { price: number; }) => a.price - b.price);
-
-    const top5Cheapest: InventoryData[] = sortedInventory
+      .sort((a: { price: number; }, b: { price: number; }) => a.price - b.price)
       .slice(0, 5)
       .reduce((acc: InventoryData[], curr: any) =>
       ([
