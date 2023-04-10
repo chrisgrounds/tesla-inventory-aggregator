@@ -5,13 +5,13 @@
 // example test. To run these tests, uncomment this file along with the
 // example resource in lib/tsla-inventory-aggregator-stack.ts
 test('SQS Queue Created', () => {
-//   const app = new cdk.App();
-//     // WHEN
-//   const stack = new TslaInventoryAggregator.TslaInventoryAggregatorStack(app, 'MyTestStack');
-//     // THEN
-//   const template = Template.fromStack(stack);
+  //   const app = new cdk.App();
+  //     // WHEN
+  //   const stack = new TslaInventoryAggregator.TslaInventoryAggregatorStack(app, 'MyTestStack');
+  //     // THEN
+  //   const template = Template.fromStack(stack);
 
-//   template.hasResourceProperties('AWS::SQS::Queue', {
-//     VisibilityTimeout: 300
-//   });
+  //   template.hasResourceProperties('AWS::SQS::Queue', {
+  //     VisibilityTimeout: 300
+  //   });
 });
