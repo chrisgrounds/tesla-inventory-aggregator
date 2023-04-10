@@ -63,11 +63,11 @@ const buildEmailBody = (inventory: InventoryData[]) => {
                               <tr>
                                 <td align="center" valign="top">
                                   <table>
-                                    <thead style="background:#009879;color:white">
-                                      <tr style="background:#009879;color:white">
-                                        <th>Model</th>
-                                        <th>Year</th>
-                                        <th>Price</th>
+                                    <thead style="background:#009879">
+                                      <tr style="background:#009879">
+                                        <th><font style="font-size:14px" color="white">Model</font></th>
+                                        <th><font style="font-size:14px" color="white">Year</font></th>
+                                        <th><font style="font-size:14px" color="white">Price</font></th>
                                       </tr>
                                     </thead>
                                     <tbody>
