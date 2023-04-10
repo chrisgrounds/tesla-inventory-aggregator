@@ -162,7 +162,7 @@ export const handler: Handler = async (_event, _context) => {
           },
           // Text: { Data: "Hello from lambda" },
         },
-        Subject: { Data: "Hello from lambda" },
+        Subject: { Data: `Tesla Inventory Aggregation` },
       },
       Source: process.env.SOURCE_ADDR || "",
     });
