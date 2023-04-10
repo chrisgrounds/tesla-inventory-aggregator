@@ -36,15 +36,21 @@ type InventoryData = {
 const tslaInventoryApi = "https://www.tesla.com/inventory/api/v1/inventory-results?query=%7B%22query%22%3A%7B%22model%22%3A%22ms%22%2C%22condition%22%3A%22used%22%2C%22options%22%3A%7B%7D%2C%22arrangeby%22%3A%22Price%22%2C%22order%22%3A%22asc%22%2C%22market%22%3A%22GB%22%2C%22language%22%3A%22en%22%2C%22super_region%22%3A%22north%20america%22%2C%22lng%22%3A-1.5151%2C%22lat%22%3A54.5554%2C%22zip%22%3A%22DL1%22%2C%22range%22%3A0%2C%22region%22%3A%22ON%22%7D%2C%22offset%22%3A0%2C%22count%22%3A50%2C%22outsideOffset%22%3A0%2C%22outsideSearch%22%3Afalse%7D";
 
 const buildListItem = (item: InventoryData) => {
-  return `<div style="display:flex;gap:1rem;"><span>${item.model} (${item.trim_name})</span><span>${item.year}</span><span>£${item.total_price}</span></div>`;
+  return `<div class="item_container"><span>${item.model} (${item.trim_name})</span><span>${item.year}</span><span>£${item.total_price}</span></div>`;
 }
 
 const buildEmailBody = (inventory: InventoryData[]) => {
   return `
   <html>
+    <style>
+      .item_container {
+        display: flex;
+        gap: 1em;
+      }
+    </style>
     <body>
       <h1 style="">Tesla Inventory</h1>
-      <ul>${inventory.map(buildListItem)}</ul>
+      <div>${inventory.map(buildListItem)}</div>
     </body>
   </html>`
 }
