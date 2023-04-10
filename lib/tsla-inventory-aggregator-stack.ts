@@ -3,6 +3,8 @@ import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as targets from 'aws-cdk-lib/aws-events-targets'
 import { Construct } from 'constructs';
 
 export class TslaInventoryAggregatorStack extends cdk.Stack {
@@ -25,6 +27,19 @@ export class TslaInventoryAggregatorStack extends cdk.Stack {
       resources: ['*'],
       effect: iam.Effect.ALLOW,
     }));
+
+    const rule = new events.Rule(this, 'Rule', {
+      schedule: events.Schedule.cron({
+        minute: '0',
+        hour: '10',
+        day: '*',
+        weekDay: '*',
+        month: '*',
+        year: '*'
+      }),
+    });
+
+    rule.addTarget(new targets.LambdaFunction(readerLambda))
 
     // const inventoryTable = new dynamodb.Table(this, 'TslaInventory', {
     //   partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
