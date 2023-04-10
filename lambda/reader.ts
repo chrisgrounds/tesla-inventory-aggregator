@@ -160,7 +160,6 @@ export const handler: Handler = async (_event, _context) => {
             Charset: "UTF-8",
             Data: buildEmailBody(top5Cheapest)
           },
-          // Text: { Data: "Hello from lambda" },
         },
         Subject: { Data: `Tesla Inventory Aggregation` },
       },
