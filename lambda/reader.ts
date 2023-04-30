@@ -33,7 +33,7 @@ type InventoryData = {
   is_range_standard: string;
 };
 
-const tslaInventoryApi = "https://www.tesla.com/inventory/api/v1/inventory-results?query=%7B%22query%22%3A%7B%22model%22%3A%22ms%22%2C%22condition%22%3A%22used%22%2C%22options%22%3A%7B%7D%2C%22arrangeby%22%3A%22Price%22%2C%22order%22%3A%22asc%22%2C%22market%22%3A%22GB%22%2C%22language%22%3A%22en%22%2C%22super_region%22%3A%22north%20america%22%2C%22lng%22%3A-1.5151%2C%22lat%22%3A54.5554%2C%22zip%22%3A%22DL1%22%2C%22range%22%3A0%2C%22region%22%3A%22ON%22%7D%2C%22offset%22%3A0%2C%22count%22%3A50%2C%22outsideOffset%22%3A0%2C%22outsideSearch%22%3Afalse%7D";
+const createInventoryApi = (model) => `https://www.tesla.com/inventory/api/v1/inventory-results?query=%7B%22query%22%3A%7B%22model%22%3A%22${model}%22%2C%22condition%22%3A%22used%22%2C%22options%22%3A%7B%7D%2C%22arrangeby%22%3A%22Price%22%2C%22order%22%3A%22asc%22%2C%22market%22%3A%22GB%22%2C%22language%22%3A%22en%22%2C%22super_region%22%3A%22north%20america%22%2C%22lng%22%3A-1.5151%2C%22lat%22%3A54.5554%2C%22zip%22%3A%22DL1%22%2C%22range%22%3A0%2C%22region%22%3A%22ON%22%7D%2C%22offset%22%3A0%2C%22count%22%3A50%2C%22outsideOffset%22%3A0%2C%22outsideSearch%22%3Afalse%7D`;
 
 const buildListItem = (item: InventoryData) =>
   `<tr><td style="padding:10px 20px;">${item.model} (${item.trim_name})</td><td style="padding:10px 20px;">${item.year}</td><td style="padding:10px 20px;">£${item.total_price}</td></tr>`;
@@ -98,9 +98,8 @@ const buildEmailBody = (inventory: InventoryData[]) => {
   </html>`
 }
 
-export const handler: Handler = async (_event, _context) => {
-  try {
-    const res = await fetch(tslaInventoryApi, {
+const getInventoryData = async (model) => {
+  const res = await fetch(createInventoryApi(model), {
       "headers": {},
       "method": "GET",
       "mode": "cors",
@@ -147,6 +146,21 @@ export const handler: Handler = async (_event, _context) => {
           is_range_standard: curr.IsRangeStandard,
         }
       ]), []);
+
+    return top5Cheapest;
+}
+
+export const handler: Handler = async (_event, _context) => {
+  try {
+
+    const modelS = await getInventoryData("ms");
+    const model3 = await getInventoryData("m3");
+    const modelX = await getInventoryData("mx");
+    const modelY = await getInventoryData("my");
+
+    const top5Cheapest = [...modelS, ...model3, ...modelX, ...modelY]
+      .sort((a: { price: number; }, b: { price: number; }) => a.price - b.price)
+      .slice(0, 5);
 
     const ses = new SESClient({ region: "eu-west-2" });
 
