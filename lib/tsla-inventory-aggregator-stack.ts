@@ -28,6 +28,12 @@ export class TslaInventoryAggregatorStack extends cdk.Stack {
       effect: iam.Effect.ALLOW,
     }));
 
+    readerLambda.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['dynamodb:PutItem'],
+      resources: ['*'],
+      effect: iam.Effect.ALLOW,
+    }));
+
     const rule = new events.Rule(this, 'Rule', {
       schedule: events.Schedule.cron({
         minute: '0',
@@ -40,9 +46,10 @@ export class TslaInventoryAggregatorStack extends cdk.Stack {
 
     rule.addTarget(new targets.LambdaFunction(readerLambda))
 
-    const inventoryTable = new dynamodb.Table(this, 'TeslaInventory', {
-      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
-      tableName: 'cheapest-tesla-inventory',
+    new dynamodb.Table(this, 'TeslaInventory', {
+      partitionKey: { name: 'Id', type: dynamodb.AttributeType.STRING },
+      // sortKey: { name: 'Date', type: dynamodb.AttributeType.STRING },
+      tableName: 'cheapest_tesla_inventory',
     });
   }
 }

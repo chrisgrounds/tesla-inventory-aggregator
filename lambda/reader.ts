@@ -1,6 +1,7 @@
 import { Handler } from 'aws-lambda';
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
+import { v4 as uuidv4 } from 'uuid';
 
 type InventoryData = {
   adl_opts: string;
@@ -36,6 +37,9 @@ type InventoryData = {
 
 const createInventoryApi = (model: string) => `https://www.tesla.com/inventory/api/v1/inventory-results?query=%7B%22query%22%3A%7B%22model%22%3A%22${model}%22%2C%22condition%22%3A%22used%22%2C%22options%22%3A%7B%7D%2C%22arrangeby%22%3A%22Price%22%2C%22order%22%3A%22asc%22%2C%22market%22%3A%22GB%22%2C%22language%22%3A%22en%22%2C%22super_region%22%3A%22north%20america%22%2C%22lng%22%3A-1.5151%2C%22lat%22%3A54.5554%2C%22zip%22%3A%22DL1%22%2C%22range%22%3A0%2C%22region%22%3A%22ON%22%7D%2C%22offset%22%3A0%2C%22count%22%3A50%2C%22outsideOffset%22%3A0%2C%22outsideSearch%22%3Afalse%7D`;
 
+const stripModelNames = (str: string) => 
+  str.replace(/\bModel (3|Y|X|S)\b/g, '');
+
 const prettyModels: Record<string, string> = {
   "ms": "Model S",
   "m3": "Model 3",
@@ -44,7 +48,7 @@ const prettyModels: Record<string, string> = {
 };
 
 const buildListItem = (item: InventoryData) =>
-  `<tr><td style="padding:10px 20px;">${prettyModels[item.model]} (${item.trim_name})</td><td style="padding:10px 20px;">${item.year}</td><td style="padding:10px 20px;">£${item.total_price}</td></tr>`;
+  `<tr><td style="padding:10px 20px;">${prettyModels[item.model]} (${stripModelNames(item.trim_name)})</td><td style="padding:10px 20px;">${item.year}</td><td style="padding:10px 20px;">£${item.total_price}</td></tr>`;
 
 const buildEmailBody = (inventory: InventoryData[]) => {
   return `
@@ -174,10 +178,12 @@ export const handler: Handler = async (_event, _context) => {
     const ses = new SESClient({ region: "eu-west-2" });
 
     const putItem = new PutItemCommand({
-      TableName: "cheapest-tesla-inventory",
+      TableName: "cheapest_tesla_inventory",
       Item: {
+        Id: { "S": uuidv4() },
         Model: { "S": prettyModels[top5Cheapest[0].model] },
-        Price: { "N": top5Cheapest[0].price}
+        Price: { "S": top5Cheapest[0].price.toString()},
+        Date: { "S": new Date().toISOString() },
       }
     });
 
