@@ -40,9 +40,9 @@ export class TslaInventoryAggregatorStack extends cdk.Stack {
 
     rule.addTarget(new targets.LambdaFunction(readerLambda))
 
-    // const inventoryTable = new dynamodb.Table(this, 'TslaInventory', {
-    //   partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
-    //   tableName: 'tsla-inventory',
-    // });
+    const inventoryTable = new dynamodb.Table(this, 'TeslaInventory', {
+      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
+      tableName: 'cheapest-tesla-inventory',
+    });
   }
 }

@@ -1,5 +1,6 @@
 import { Handler } from 'aws-lambda';
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+import { DynamoDBClient } from "@aws-sdk/dynamo-db";
 
 type InventoryData = {
   adl_opts: string;
@@ -33,10 +34,17 @@ type InventoryData = {
   is_range_standard: string;
 };
 
-const createInventoryApi = (model) => `https://www.tesla.com/inventory/api/v1/inventory-results?query=%7B%22query%22%3A%7B%22model%22%3A%22${model}%22%2C%22condition%22%3A%22used%22%2C%22options%22%3A%7B%7D%2C%22arrangeby%22%3A%22Price%22%2C%22order%22%3A%22asc%22%2C%22market%22%3A%22GB%22%2C%22language%22%3A%22en%22%2C%22super_region%22%3A%22north%20america%22%2C%22lng%22%3A-1.5151%2C%22lat%22%3A54.5554%2C%22zip%22%3A%22DL1%22%2C%22range%22%3A0%2C%22region%22%3A%22ON%22%7D%2C%22offset%22%3A0%2C%22count%22%3A50%2C%22outsideOffset%22%3A0%2C%22outsideSearch%22%3Afalse%7D`;
+const createInventoryApi = (model: string) => `https://www.tesla.com/inventory/api/v1/inventory-results?query=%7B%22query%22%3A%7B%22model%22%3A%22${model}%22%2C%22condition%22%3A%22used%22%2C%22options%22%3A%7B%7D%2C%22arrangeby%22%3A%22Price%22%2C%22order%22%3A%22asc%22%2C%22market%22%3A%22GB%22%2C%22language%22%3A%22en%22%2C%22super_region%22%3A%22north%20america%22%2C%22lng%22%3A-1.5151%2C%22lat%22%3A54.5554%2C%22zip%22%3A%22DL1%22%2C%22range%22%3A0%2C%22region%22%3A%22ON%22%7D%2C%22offset%22%3A0%2C%22count%22%3A50%2C%22outsideOffset%22%3A0%2C%22outsideSearch%22%3Afalse%7D`;
+
+const prettyModels: Record<string, string> = {
+  "ms": "Model S",
+  "m3": "Model 3",
+  "mx": "Model X",
+  "my": "Model Y",
+};
 
 const buildListItem = (item: InventoryData) =>
-  `<tr><td style="padding:10px 20px;">${item.model} (${item.trim_name})</td><td style="padding:10px 20px;">${item.year}</td><td style="padding:10px 20px;">£${item.total_price}</td></tr>`;
+  `<tr><td style="padding:10px 20px;">${prettyModels[item.model]} (${item.trim_name})</td><td style="padding:10px 20px;">${item.year}</td><td style="padding:10px 20px;">£${item.total_price}</td></tr>`;
 
 const buildEmailBody = (inventory: InventoryData[]) => {
   return `
@@ -98,7 +106,7 @@ const buildEmailBody = (inventory: InventoryData[]) => {
   </html>`
 }
 
-const getInventoryData = async (model) => {
+const getInventoryData = async (model: string) => {
   const res = await fetch(createInventoryApi(model), {
       "headers": {},
       "method": "GET",
@@ -152,17 +160,26 @@ const getInventoryData = async (model) => {
 
 export const handler: Handler = async (_event, _context) => {
   try {
-
     const modelS = await getInventoryData("ms");
     const model3 = await getInventoryData("m3");
     const modelX = await getInventoryData("mx");
     const modelY = await getInventoryData("my");
 
     const top5Cheapest = [...modelS, ...model3, ...modelX, ...modelY]
-      .sort((a: { price: number; }, b: { price: number; }) => a.price - b.price)
+      .sort((a: InventoryData, b: InventoryData) => Number(a.price) - Number(b.price))
       .slice(0, 5);
 
+    const dynamodb = new DynamoDBClient({ region: "eu-west-2" });
+
     const ses = new SESClient({ region: "eu-west-2" });
+
+    await dynamodb.putItem({
+      TableName: "cheapest-tesla-inventory",
+      Item: {
+        Model: { "S": prettyModels[top5Cheapest[0].model] },
+        Price: { "N": top5Cheapest[0].price}
+      }
+    });
 
     const command = new SendEmailCommand({
       Destination: {
@@ -180,13 +197,8 @@ export const handler: Handler = async (_event, _context) => {
       Source: process.env.SOURCE_ADDR || "",
     });
 
-    try {
-      console.log("Sending email");
-      await ses.send(command);
-    }
-    catch (error) {
-      console.log(error);
-    }
+    console.log("Sending email");
+    await ses.send(command);
   } catch (err) {
     console.log(err);
   }
