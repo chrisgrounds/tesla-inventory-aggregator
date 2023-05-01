@@ -1,6 +1,6 @@
 import { Handler } from 'aws-lambda';
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
-import { DynamoDBClient } from "@aws-sdk/dynamo-db";
+import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 
 type InventoryData = {
   adl_opts: string;
@@ -173,13 +173,15 @@ export const handler: Handler = async (_event, _context) => {
 
     const ses = new SESClient({ region: "eu-west-2" });
 
-    await dynamodb.putItem({
+    const putItem = new PutItemCommand({
       TableName: "cheapest-tesla-inventory",
       Item: {
         Model: { "S": prettyModels[top5Cheapest[0].model] },
         Price: { "N": top5Cheapest[0].price}
       }
     });
+
+    await dynamodb.send(putItem);
 
     const command = new SendEmailCommand({
       Destination: {
